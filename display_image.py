@@ -30,14 +30,12 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0"):
 
     if bpp == 16:
         image_rgb = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
-        
-        
+
         R = image_rgb[:, :, 0]
         G = image_rgb[:, :, 1]
         B = image_rgb[:, :, 2]
-        
+
         packed_image = ((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3)
-        
         framebuffer_data = packed_image.astype(np.uint16)
         
     elif bpp == 24 or bpp == 32:
@@ -73,19 +71,18 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0"):
         
 if __name__ == "__main__":
 
-    os.system("setterm -cursor off > /dev/tty1")
-    os.system("clear > /dev/tty1")
+    os.system("setterm -cursor off")
+    os.system("clear")
    
 
    
 
     test_image = cv2.imread("../egg.png")
-    test_image = cv2.cvtColor(test_image,cv2.COLOR_BGR2RGB)
     test_image = cv2.rotate(test_image, cv2.ROTATE_180)
     success = display_opencv_on_framebuffer(test_image, fb_device_path="/dev/fb0")
     
     if success:
         time.sleep(5) 
 
-    os.system("setterm -cursor on > /dev/tty1")
-    os.system("clear > /dev/tty1")
+    os.system("setterm -cursor on")
+    os.system("clear")
