@@ -29,10 +29,12 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0"):
         image_np = cv2.resize(image_np, (w, h), interpolation=cv2.INTER_AREA)
 
     if bpp == 16:
-        image_rgb = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
-        R = image_rgb[:, :, 0]
-        G = image_rgb[:, :, 1]
-        B = image_rgb[:, :, 2]
+        image_bgr = image_np  
+
+        B = image_bgr[:, :, 0]
+        G = image_bgr[:, :, 1]
+        R = image_bgr[:, :, 2]
+
         packed_image = ((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3)
         framebuffer_data = packed_image.astype(np.uint16)
         framebuffer_data.byteswap(inplace=True)
