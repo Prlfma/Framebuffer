@@ -2,70 +2,71 @@ import cv2
 import os
 import sys
 import time
-# Імпортуємо вашу функцію з іншого файлу
-from display_image import display_opencv_on_framebuffer
+# Import your function from the other file
+from framebuffer_display import display_opencv_on_framebuffer
 
-# --- Налаштування ---
-FB_DEVICE = "/dev/fb0"       # Шлях до вашого фреймбуфера
-VIDEO_SOURCE = 0             # Джерело відео (0 - зазвичай перша веб-камера)
-ROTATE_FRAME = cv2.ROTATE_180 # Поворот кадру (як у вашому прикладі)
+# --- Settings ---
+FB_DEVICE = "/dev/fb0"       # Path to your framebuffer
+VIDEO_SOURCE = 0             # Video source (0 is usually the first webcam)
+ROTATE_FRAME = cv2.ROTATE_180 # Frame rotation (as in your example)
 # --- --- --- --- ---
 
 def main():
-    # --- Підготовка терміналу ---
-    # (Вимикаємо курсор та очищуємо екран)
-    print("Запуск відеопотоку на фреймбуфер...")
+    # --- Prepare terminal ---
+    # (Disable cursor and clear screen)
+    print("Starting video stream to framebuffer...")
     os.system("setterm -cursor off")
     os.system("clear")
 
-    # --- Відкриття відеоджерела ---
+    # --- Open video source ---
     cap = cv2.VideoCapture(VIDEO_SOURCE)
     if not cap.isOpened():
-        print(f"Помилка: Неможливо відкрити відеоджерело {VIDEO_SOURCE}", file=sys.stderr)
-        os.system("setterm -cursor on") # Відновлюємо курсор
+        print(f"Error: Could not open video source {VIDEO_SOURCE}", file=sys.stderr)
+        os.system("setterm -cursor on") # Restore cursor
         os.system("clear")
         sys.exit(1)
     
-    print(f"Відеопотік з {VIDEO_SOURCE} відкрито.")
-    print(f"Виведення на {FB_DEVICE}. Натисніть Ctrl+C для виходу.")
+    print(f"Video stream from {VIDEO_SOURCE} opened.")
+    print(f"Outputting to {FB_DEVICE}. Press Ctrl+C to exit.")
 
     try:
         while True:
-            # --- Читання кадру ---
+            # --- Read frame ---
             ret, frame = cap.read()
             if not ret:
-                print("Помилка: Неможливо отримати кадр (кінець потоку?).", file=sys.stderr)
+                print("Error: Could not retrieve frame (end of stream?).", file=sys.stderr)
                 break
             
-            # --- Обробка кадру ---
-            # Я помітив, що у вашому прикладі ви повертали зображення.
-            # Якщо це не потрібно, закоментуйте або видаліть наступний рядок.
+            # --- Process frame ---
+            # I noticed you were rotating the image in your example.
+            # If this is not needed, comment out or remove the next line.
             if ROTATE_FRAME is not None:
                 frame_processed = cv2.rotate(frame, ROTATE_FRAME)
             else:
                 frame_processed = frame
 
-            # --- Відображення кадру ---
+            # --- Display frame ---
             if not display_opencv_on_framebuffer(frame_processed, FB_DEVICE):
-                print("Помилка: Не вдалося записати у фреймбуфер. Вихід...", file=sys.stderr)
+                print("Error: Failed to write to framebuffer. Exiting...", file=sys.stderr)
                 break
     
     except KeyboardInterrupt:
-        # Обробка Ctrl+C для чистого виходу
-        print("\nЗупинка відеопотоку...")
+        # Handle Ctrl+C for a clean exit
+        print("\nStopping video stream...")
     
     except Exception as e:
-        print(f"Сталася неочікувана помилка: {e}", file=sys.stderr)
+        print(f"An unexpected error occurred: {e}", file=sys.stderr)
 
     finally:
-        # --- Очищення ---
-        print("Відновлення терміналу та звільнення пристроїв...")
+        # --- Cleanup ---
+        print("Restoring terminal and releasing devices...")
         if cap.isOpened():
             cap.release()
-        # Повертаємо курсор та очищуємо екран
+        # Restore cursor and clear screen
         os.system("setterm -cursor on")
         os.system("clear")
-        print("Роботу завершено.")
+        print("Finished.")
 
 if __name__ == "__main__":
     main()
+
