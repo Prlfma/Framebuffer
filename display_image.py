@@ -29,13 +29,14 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0"):
         image_np = cv2.resize(image_np, (w, h), interpolation=cv2.INTER_AREA)
 
     if bpp == 16:
-        image_bgr = image_np  
+        image_bgr = image_np  # OpenCV -> BGR
 
         B = image_bgr[:, :, 0]
         G = image_bgr[:, :, 1]
         R = image_bgr[:, :, 2]
 
-        packed_image = ((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3)
+        # 🧩 Формуємо BGR565 (не RGB565)
+        packed_image = ((B >> 3) << 11) | ((G >> 2) << 5) | (R >> 3)
         framebuffer_data = packed_image.astype(np.uint16)
         framebuffer_data.byteswap(inplace=True)
         
@@ -75,11 +76,14 @@ if __name__ == "__main__":
     os.system("setterm -cursor off")
     os.system("clear")
    
-
+    test_image = np.zeros((200, 300, 3), dtype=np.uint8)
+    test_image[:, :100] = (255, 0, 0)   
+    test_image[:, 100:200] = (0, 255, 0)  
+    test_image[:, 200:] = (0, 0, 255)
    
 
-    test_image = cv2.imread("../egg.png")
-    test_image = cv2.rotate(test_image, cv2.ROTATE_180)
+    #test_image = cv2.imread("../egg.png")
+    #test_image = cv2.rotate(test_image, cv2.ROTATE_180)
     success = display_opencv_on_framebuffer(test_image, fb_device_path="/dev/fb0")
     
     if success:
