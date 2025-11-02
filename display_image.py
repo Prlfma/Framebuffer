@@ -79,8 +79,9 @@ if __name__ == "__main__":
 
    
 
-    test_image = cv2.imread("egg.png")
+    test_image = cv2.imread("../egg.png")
     test_image = cv2.cvtColor(test_image,cv2.COLOR_BGR2RGB)
+    test_image = cv2.rotate(test_image, cv2.ROTATE_180)
     success = display_opencv_on_framebuffer(test_image, fb_device_path="/dev/fb0")
     
     if success:
