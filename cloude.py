@@ -25,9 +25,9 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0"):
         image_np = cv2.resize(image_np, (w, h), interpolation=cv2.INTER_AREA)
     
     if bpp == 16:
-        B = image_np[:, :, 0]
+        B = image_np[:, :, 2]
         G = image_np[:, :, 1]
-        R = image_np[:, :, 2]
+        R = image_np[:, :, 1]
         
         # BGR565: Blue at bit 11, Green at bit 5, Red at bit 0
         packed_image = ((B >> 3) << 11) | ((G >> 2) << 5) | (R >> 3)
