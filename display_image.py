@@ -62,13 +62,9 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0"):
 if __name__ == "__main__":
     os.system("setterm -cursor off")
     os.system("clear")
-    
-    test_image = np.zeros((200, 300, 3), dtype=np.uint8)
-    test_image[:, :100] = (0, 0, 255)      
-    test_image[:, 100:200] = (0, 255, 0)    
-    test_image[:, 200:] = (255, 0, 0)      
-    #test_image = cv2.imread("../egg.png")
-    #test_image = cv2.rotate(test_image, cv2.ROTATE_180)
+       
+    test_image = cv2.imread("../egg.png")
+    test_image = cv2.rotate(test_image, cv2.ROTATE_180)
     success = display_opencv_on_framebuffer(test_image, fb_device_path="/dev/fb0")
     
     if success:
