@@ -3,7 +3,7 @@ import os
 import sys
 import time
 # Імпортуємо вашу функцію з іншого файлу
-from framebuffer_display import display_opencv_on_framebuffer
+from display_image import display_opencv_on_framebuffer
 
 # --- Налаштування ---
 FB_DEVICE = "/dev/fb0"       # Шлях до вашого фреймбуфера
