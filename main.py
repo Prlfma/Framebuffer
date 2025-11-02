@@ -46,7 +46,7 @@ def main():
                 frame_processed = frame
 
             # --- Display frame ---
-            if not display_opencv_on_framebuffer(frame_processed, FB_DEVICE):
+            if not display_opencv_on_framebuffer(frame_processed):
                 print("Error: Failed to write to framebuffer. Exiting...", file=sys.stderr)
                 break
     
