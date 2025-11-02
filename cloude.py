@@ -21,27 +21,29 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0"):
         print(f"Error reading framebuffer info: {e}")
         return False
     
+    print(f"Framebuffer: {w}x{h}, BPP: {bpp}")
+    
+    # Resize image to match framebuffer dimensions
     if image_np.shape[0] != h or image_np.shape[1] != w:
         image_np = cv2.resize(image_np, (w, h), interpolation=cv2.INTER_AREA)
     
     if bpp == 16:
-        B = image_np[:, :, 2]
-        G = image_np[:, :, 1]
-        R = image_np[:, :, 1]
+        # Extract color channels
+        B = image_np[:, :, 0]  # Blue
+        G = image_np[:, :, 1]  # Green  
+        R = image_np[:, :, 2]  # Red
         
-        # BGR565: Blue at bit 11, Green at bit 5, Red at bit 0
-        packed_image = ((B >> 3) << 11) | ((G >> 2) << 5) | (R >> 3)
+        # Correct BGR565 conversion based on your mode: rgba 5/11, 6/5, 5/0
+        # This means: Red 5 bits at position 0, Green 6 bits at position 5, Blue 5 bits at position 11
+        packed_image = ((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3)
         framebuffer_data = packed_image.astype(np.uint16)
-
-
-      
         
     elif bpp == 24 or bpp == 32:
         if bpp == 32 and image_np.shape[2] == 3:
             image_bgra = np.zeros((image_np.shape[0], image_np.shape[1], 4), dtype=np.uint8)
-            image_bgra[:, :, 0] = image_np[:, :, 2]  # R
+            image_bgra[:, :, 0] = image_np[:, :, 2]  # B
             image_bgra[:, :, 1] = image_np[:, :, 1]  # G
-            image_bgra[:, :, 2] = image_np[:, :, 0]  # B
+            image_bgra[:, :, 2] = image_np[:, :, 0]  # R
             image_bgra[:, :, 3] = 255                 # A
             image_np = image_bgra
         elif bpp == 24 and image_np.shape[2] == 4:
@@ -72,15 +74,23 @@ if __name__ == "__main__":
     os.system("setterm -cursor off")
     os.system("clear")
     
-    test_image = np.zeros((200, 300, 3), dtype=np.uint8)
-    test_image[:, :100] = (0, 0, 255)      # Червоний
-    test_image[:, 100:200] = (0, 255, 0)   # Зелений
-    test_image[:, 200:] = (255, 0, 0)      # Синій
+    # Create a proper test image with correct color order
+    height, width = 480, 800  # Match your framebuffer resolution
+    test_image = np.zeros((height, width, 3), dtype=np.uint8)
     
+    # Define color regions (in BGR order for OpenCV)
+    test_image[:, :width//3] = (255, 0, 0)        # Blue (left third)
+    test_image[:, width//3:2*width//3] = (0, 255, 0)  # Green (middle third)  
+    test_image[:, 2*width//3:] = (0, 0, 255)      # Red (right third)
+    
+    print("Displaying test image...")
     success = display_opencv_on_framebuffer(test_image, fb_device_path="/dev/fb0")
     
     if success:
+        print("Image displayed successfully. Waiting 5 seconds...")
         time.sleep(5) 
+    else:
+        print("Failed to display image")
     
     os.system("setterm -cursor on")
     os.system("clear")
