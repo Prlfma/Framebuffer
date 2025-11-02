@@ -17,8 +17,6 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0"):
         bytes_per_pixel = bpp // 8
         screen_size_bytes = w * h * bytes_per_pixel
         
-        print(f"Framebuffer: {w}x{h}, {bpp} bpp")
-        
     except Exception as e:
         print(f"Error reading framebuffer info: {e}")
         return False
@@ -31,10 +29,10 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0"):
         G = image_np[:, :, 1]
         R = image_np[:, :, 2]
         
-        # BGR565 формат (деякі framebuffer'и використовують BGR замість RGB)
-        packed_image = ((B >> 3) << 11) | ((G >> 2) << 5) | (R >> 3)
+        # ЗМІНЕНО: тепер G використовує всі 6 біт
+        packed_image = ((R >> 3) << 11) | (G << 5) | (B >> 3)
         framebuffer_data = packed_image.astype(np.uint16)
-        # БЕЗ byteswap
+        framebuffer_data.byteswap(inplace=True)
         
     elif bpp == 24 or bpp == 32:
         if bpp == 32 and image_np.shape[2] == 3:
@@ -73,10 +71,9 @@ if __name__ == "__main__":
     os.system("clear")
     
     test_image = np.zeros((200, 300, 3), dtype=np.uint8)
-    # BGR формат для OpenCV
     test_image[:, :100] = (0, 0, 255)      # Червоний
-    test_image[:, 100:200] = (0, 255, 0)   # Зелений  
-    test_image[:, 200:] = (255, 0, 0)      # Голубий
+    test_image[:, 100:200] = (0, 255, 0)   # Зелений
+    test_image[:, 200:] = (255, 0, 0)      # Синій
     
     success = display_opencv_on_framebuffer(test_image, fb_device_path="/dev/fb0")
     
