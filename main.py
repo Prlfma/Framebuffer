@@ -3,7 +3,7 @@ import os
 import sys
 import time
 # Import your function from the other file
-from framebuffer_display import display_opencv_on_framebuffer
+from display_image import display_opencv_on_framebuffer
 
 # --- Settings ---
 FB_DEVICE = "/dev/fb0"       # Path to your framebuffer
