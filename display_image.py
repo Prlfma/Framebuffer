@@ -24,9 +24,9 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0"):
         image_np = cv2.resize(image_np, (w, h), interpolation=cv2.INTER_AREA)
     
     if bpp == 16:
-        B = image_np[:, :, 0]
-        G = image_np[:, :, 1]
-        R = image_np[:, :, 2]
+        B = image_np[:, :, 0].astype(np.uint32)
+        G = image_np[:, :, 1].astype(np.uint32)
+        R = image_np[:, :, 2].astype(np.uint32)
         
         packed_image = ((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3)
         framebuffer_data = packed_image.astype(np.uint16)
