@@ -26,7 +26,6 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0"):
         return False
 
     if image_np.shape[0] != h or image_np.shape[1] != w:
-        print(f"Resizing image to fit screen dimensions {w}x{h}")
         image_np = cv2.resize(image_np, (w, h), interpolation=cv2.INTER_AREA)
 
     if bpp == 16:
@@ -63,7 +62,6 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0"):
             framebuffer_np = np.frombuffer(fb_mmap, dtype=np.uint8).reshape((h, w, bytes_per_pixel))
             framebuffer_np[:] = framebuffer_data[:] 
 
-        print(f"Image successfully written to framebuffer ({bpp} bpp mode).")
         
         fb_mmap.close()
         fbdev.close()
@@ -86,7 +84,6 @@ if __name__ == "__main__":
     success = display_opencv_on_framebuffer(test_image, fb_device_path="/dev/fb0")
     
     if success:
-        print("Display successful. Image will remain until screen is redrawn by another process.")
         time.sleep(5) 
 
     os.system("setterm -cursor on > /dev/tty1")
