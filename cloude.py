@@ -29,10 +29,12 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0"):
         G = image_np[:, :, 1]
         R = image_np[:, :, 2]
         
-        # ЗМІНЕНО: тепер G використовує всі 6 біт
-        packed_image = ((R >> 3) << 11) | (G << 5) | (B >> 3)
+        # BGR565: Blue at bit 11, Green at bit 5, Red at bit 0
+        packed_image = ((B >> 3) << 11) | ((G >> 2) << 5) | (R >> 3)
         framebuffer_data = packed_image.astype(np.uint16)
-        framebuffer_data.byteswap(inplace=True)
+
+
+      
         
     elif bpp == 24 or bpp == 32:
         if bpp == 32 and image_np.shape[2] == 3:
