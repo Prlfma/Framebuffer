@@ -29,20 +29,21 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0", packing_m
         image_np = cv2.resize(image_np, (w, h), interpolation=cv2.INTER_AREA)
     
     if bpp == 16:
-        # Extract color channels (B, G, R from OpenCV)
-        B = image_np[:, :, 0]
-        G = image_np[:, :, 1]
-        R = image_np[:, :, 2]
+        # Extract color channels and EXPLICITLY CAST to a larger type
+        # This prevents the uint8 overflow you found.
+        B = image_np[:, :, 0].astype(np.uint32)
+        G = image_np[:, :, 1].astype(np.uint32)
+        R = image_np[:, :, 2].astype(np.uint32)
         
         # --- Mode selection logic starts here ---
+        # All operations are now "safe" within the uint32 type
+        
         if packing_mode == "RGB565":
             # Format: RRRRR GGGGGG BBBBB
-            # (OpenCV R -> R, OpenCV G -> G, OpenCV B -> B)
             packed_image = ((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3)
         
         elif packing_mode == "BGR565":
             # Format: BBBBB GGGGGG RRRRR
-            # (OpenCV B -> B (high bits), G -> G, R -> R (low bits))
             packed_image = ((B >> 3) << 11) | ((G >> 2) << 5) | (R >> 3)
         
         elif packing_mode == "RGB565_SWAP":
@@ -68,6 +69,7 @@ def display_opencv_on_framebuffer(image_np, fb_device_path="/dev/fb0", packing_m
             print(f"Error: Unknown packing mode: {packing_mode}.")
             return False
             
+        # Finally, cast the result down to the 16-bit format the framebuffer needs
         framebuffer_data = packed_image.astype(np.uint16)
         
     elif bpp == 24 or bpp == 32:
